@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Soft Life Annual Planner</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Cormorant+Garamond:ital,wght@1,400;1,600&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ivory:#FAF6F1; --linen:#F5EDE0; --caramel:#C9956B; --sage:#9CAF88; --blush:#E8C4B8; --espresso:#3B2A1A; --gold:#BFA06A;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  background:var(--ivory);
+  font-family:'Jost',sans-serif;
+  color:var(--espresso);
+  line-height:1.7;
+  font-weight:300;
+}
+.container{max-width:794px;margin:0 auto;background:var(--ivory);min-height:100vh;box-shadow:0 10px 40px rgba(201,149,107,0.15)}
+
+body::before{
+  content:'';position:fixed;top:0;left:0;right:0;bottom:0;
+  background-image:repeating-linear-gradient(45deg,transparent,transparent 2px,rgba(245,237,224,0.3) 2px,rgba(245,237,224,0.3) 4px);
+  pointer-events:none;z-index:-1;
+}
+
+.nav{
+  position:sticky;top:0;z-index:100;
+  background:rgba(250,246,241,0.95);backdrop-filter:blur(10px);
+  padding:15px 20px;border-bottom:2px solid var(--caramel);
+  display:flex;gap:10px;overflow-x:auto;
+}
+/* FIX: was .nav-btn, corrected to .nav button */
+.nav button{
+  padding:10px 18px;border:2px solid var(--caramel);
+  background:var(--linen);border-radius:15px;
+  font-family:'Jost';font-size:12px;font-weight:400;
+  cursor:pointer;white-space:nowrap;transition:all 0.3s;
+  color:var(--espresso);
+  box-shadow:0 3px 10px rgba(201,149,107,0.2);
+}
+.nav button:hover{box-shadow:0 5px 15px rgba(201,149,107,0.4);transform:translateY(-2px)}
+.nav button.active{
+  background:var(--caramel);color:white;
+  transform:scale(1.05);
+}
+
+.page{display:none;padding:50px 60px;animation:fadeUp 0.8s ease}
+.page.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(25px)}to{opacity:1;transform:translateY(0)}}
+
+h1{
+  font-family:'Fraunces',serif;
+  font-weight:700;font-size:46px;color:var(--caramel);
+  margin-bottom:12px;text-align:center;letter-spacing:-0.5px;
+}
+h2{
+  font-family:'Fraunces',serif;
+  color:var(--caramel);
+  font-size:30px;margin:35px 0 18px;
+}
+h3{margin:20px 0 12px;color:var(--espresso);font-weight:500;font-size:18px}
+h4{margin:10px 0 8px;color:var(--caramel);font-weight:500;font-size:15px}
+.subtitle{
+  font-family:'Cormorant Garamond',serif;
+  font-style:italic;font-size:22px;
+  color:var(--sage);text-align:center;margin-bottom:30px;
+}
+.eyebrow{
+  display:inline-block;
+  font-size:11px;text-transform:uppercase;
+  letter-spacing:2px;color:var(--caramel);
+  background:var(--blush);padding:6px 14px;border-radius:20px;
+  margin-bottom:20px;
+}
+
+.ghost-year{
+  font-size:140px;font-weight:700;
+  color:transparent;-webkit-text-stroke:2px var(--gold);
+  opacity:0.2;position:absolute;top:30px;left:50%;transform:translateX(-50%);z-index:0;
+}
+
+input,textarea,select{
+  width:100%;padding:14px;border:2px solid var(--linen);
+  border-radius:12px;font-family:'Jost';font-size:15px;
+  background:var(--linen);color:var(--espresso);
+  transition:all 0.3s;margin-bottom:14px;
+  box-shadow:inset 0 2px 5px rgba(201,149,107,0.1);
+}
+input:focus,textarea:focus,select:focus{
+  outline:none;border-color:var(--caramel);
+  background:white;box-shadow:0 0 0 4px rgba(201,149,107,0.15),inset 0 2px 5px rgba(201,149,107,0.1);
+}
+textarea{resize:vertical;min-height:110px}
+
+.quote-box{
+  font-family:'Cormorant Garamond',serif;
+  font-style:italic;font-size:19px;
+  color:var(--caramel);text-align:center;
+  padding:30px;border-top:2px solid var(--gold);
+  border-bottom:2px solid var(--gold);
+  margin:30px 0;position:relative;
+}
+.quote-box::before{content:'🌸';position:absolute;top:-15px;left:50%;transform:translateX(-50%);background:var(--ivory);padding:0 10px}
+
+.soft-card{
+  background:var(--linen);padding:25px;border-radius:20px;
+  border:1px solid rgba(201,149,107,0.2);
+  box-shadow:0 5px 20px rgba(201,149,107,0.1);
+  transition:0.3s;
+}
+.soft-card:hover{box-shadow:0 8px 30px rgba(201,149,107,0.2);transform:translateY(-3px)}
+
+.checkbox-item{
+  display:flex;gap:12px;align-items:center;
+  padding:14px;background:var(--linen);
+  border-radius:12px;cursor:pointer;
+  transition:0.3s;margin-bottom:10px;
+  border:2px solid transparent;
+}
+.checkbox-item:hover{background:rgba(245,237,224,0.6);box-shadow:0 3px 10px rgba(201,149,107,0.15)}
+.checkbox-item input[type="checkbox"]{width:auto;margin:0;margin-bottom:0}
+.checkbox-item.checked{border-color:var(--sage);background:rgba(156,175,136,0.15)}
+
+.slider-wrap{margin:25px 0}
+.slider{
+  -webkit-appearance:none;width:100%;height:10px;
+  background:var(--linen);border-radius:10px;outline:none;
+}
+.slider::-webkit-slider-thumb{
+  -webkit-appearance:none;width:28px;height:28px;
+  background:linear-gradient(135deg,var(--caramel),var(--gold));border-radius:50%;
+  cursor:pointer;box-shadow:0 4px 12px rgba(201,149,107,0.4);
+}
+
+.mood-grid{display:flex;gap:10px;justify-content:center;margin:20px 0}
+.mood-emoji{
+  font-size:36px;padding:12px;border-radius:50%;
+  cursor:pointer;border:3px solid transparent;transition:0.3s;
+}
+.mood-emoji.active{border-color:var(--caramel);background:rgba(201,149,107,0.15);transform:scale(1.2);box-shadow:0 4px 15px rgba(201,149,107,0.3)}
+
+.stars{display:flex;gap:8px;font-size:34px;justify-content:center}
+.star{cursor:pointer;color:var(--linen);transition:0.3s}
+.star.active{color:var(--gold);text-shadow:0 2px 8px rgba(191,160,106,0.5)}
+
+.progress-bar{
+  width:100%;height:14px;background:var(--linen);
+  border-radius:10px;overflow:hidden;margin:10px 0;cursor:pointer;
+}
+.progress-fill{
+  height:100%;background:linear-gradient(90deg,var(--caramel),var(--gold));
+  width:0%;transition:width 0.6s ease;
+}
+
+.month-grid{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:18px;
+  margin:25px 0;
+}
+.month-card{
+  background:var(--linen);padding:18px;border-radius:16px;
+  border:2px solid rgba(201,149,107,0.2);
+  position:relative;
+}
+.month-dot{
+  position:absolute;top:10px;right:10px;
+  width:20px;height:20px;border-radius:50%;
+  border:2px solid var(--caramel);cursor:pointer;
+}
+.month-dot.done{background:var(--sage);border-color:var(--sage)}
+
+.joy-grid{
+  display:grid;grid-template-columns:repeat(13,1fr);gap:6px;
+  margin:20px 0;
+}
+.joy-cell{
+  width:28px;height:28px;border:2px solid var(--linen);
+  border-radius:6px;cursor:pointer;transition:0.2s;
+}
+.joy-cell:hover{border-color:var(--caramel)}
+.joy-cell.checked{background:var(--blush);border-color:var(--blush)}
+
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:30px}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+
+.print-btn{
+  position:fixed;bottom:35px;right:35px;
+  padding:16px 30px;background:var(--caramel);
+  color:white;border:none;border-radius:50px;
+  font-weight:500;cursor:pointer;
+  box-shadow:0 8px 25px rgba(201,149,107,0.4);
+  z-index:99;transition:0.3s;font-family:'Jost';font-size:15px;
+}
+.print-btn:hover{transform:scale(1.08);box-shadow:0 12px 35px rgba(201,149,107,0.5)}
+
+.page-footer{
+  text-align:center;font-size:11px;
+  color:var(--caramel);opacity:0.7;
+  margin-top:45px;padding-top:25px;
+  border-top:1px solid var(--linen);
+}
+
+.cozy-section{
+  background:var(--espresso);color:var(--ivory);
+  padding:35px;border-radius:25px;margin:25px 0;
+}
+.cozy-section h2{color:var(--blush)}
+.cozy-section h3{color:var(--blush)}
+.cozy-section h4{color:var(--blush)}
+.cozy-section input,.cozy-section textarea,.cozy-section select{
+  background:rgba(250,246,241,0.1);color:var(--ivory);
+  border-color:rgba(250,246,241,0.3);
+}
+.cozy-section input::placeholder,.cozy-section textarea::placeholder{color:rgba(250,246,241,0.5)}
+.cozy-section .checkbox-item{background:rgba(250,246,241,0.08);color:var(--ivory)}
+
+.lined{
+  background:repeating-linear-gradient(transparent,transparent 30px,rgba(201,149,107,0.15) 30px,rgba(201,149,107,0.15) 32px);
+  min-height:350px;padding-top:8px;
+}
+
+table{width:100%;border-collapse:collapse}
+table th{text-align:left;padding:10px;font-weight:500;color:var(--caramel);border-bottom:2px solid var(--linen)}
+table td{padding:8px}
+table tr:nth-child(even){background:rgba(245,237,224,0.3)}
+table input{margin-bottom:0;padding:8px}
+
+.star-rating{display:flex;gap:6px;margin:8px 0 16px}
+.star-rating .star{font-size:28px}
+
+@media print{
+  .nav,.print-btn{display:none}
+  .page{display:block !important;margin-bottom:40px;page-break-after:always}
+  body{background:white}
+}
+
+/* FIX: was missing closing } on mobile media query */
+@media(max-width:768px){
+  .page{padding:30px 25px}
+  h1{font-size:34px}
+  .grid-2,.grid-3{grid-template-columns:1fr}
+  .month-grid{grid-template-columns:repeat(2,1fr)}
+  .ghost-year{font-size:90px}
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  
+  <div class="nav">
+    <button class="active" onclick="showPage(1)">Cover</button>
+    <button onclick="showPage(2)">Soft Life</button>
+    <button onclick="showPage(3)">Intentions</button>
+    <button onclick="showPage(4)">Rituals</button>
+    <button onclick="showPage(5)">Joy</button>
+    <button onclick="showPage(6)">Rest</button>
+    <button onclick="showPage(7)">Abundance</button>
+    <button onclick="showPage(8)">Boundaries</button>
+    <button onclick="showPage(9)">Sanctuary</button>
+    <button onclick="showPage(10)">Creativity</button>
+    <button onclick="showPage(11)">Weekly Reset</button>
+    <button onclick="showPage(12)">Review</button>
+  </div>
+
+  <!-- PAGE 1: COVER -->
+  <div class="page active" id="page1">
+    <div style="text-align:center;padding:70px 0;position:relative">
+      <div class="ghost-year">2026</div>
+      <div class="eyebrow">✦ Anti-Hustle. Pro-Joy. ✦</div>
+      <h1>Soft Life Annual Planner</h1>
+      <div class="subtitle">— rest, joy &amp; abundance, always —</div>
+      <div style="font-size:50px;margin:25px 0">☕🕯️🌿</div>
+      <div style="max-width:420px;margin:50px auto 0;position:relative;z-index:2">
+        <input type="text" placeholder="This planner belongs to: ___" id="owner">
+        <input type="date" id="softStart">
+        <input type="text" placeholder="My word for this year: ___" id="wordYear">
+      </div>
+      <div style="margin-top:60px;font-style:italic;font-size:19px;color:var(--sage)">
+        You are allowed to have a beautiful, easy, joyful life. ☕
+      </div>
+    </div>
+    <div class="page-footer">Soft Life Annual Planner • Page 1</div>
+  </div>
+
+  <!-- PAGE 2: WHAT IS MY SOFT LIFE -->
+  <div class="page" id="page2">
+    <h2>What Is My Soft Life?</h2>
+    <div class="quote-box">
+      The soft life isn't about being lazy.<br>
+      It's about being intentional with your peace.
+    </div>
+    <h3>My Soft Life Definition</h3>
+    <textarea placeholder="To me, softness means..." rows="6"></textarea>
+    <h3>What softness looks like for me in...</h3>
+    <div class="grid-3">
+      <div class="soft-card"><div style="font-size:32px;margin-bottom:8px">☀️</div><h3>Mornings</h3><textarea placeholder="My soft mornings look like..." rows="3"></textarea></div>
+      <div class="soft-card"><div style="font-size:32px;margin-bottom:8px">🏠</div><h3>My Home</h3><textarea placeholder="My soft home feels like..." rows="3"></textarea></div>
+      <div class="soft-card"><div style="font-size:32px;margin-bottom:8px">💼</div><h3>My Work</h3><textarea placeholder="My soft work means..." rows="3"></textarea></div>
+      <div class="soft-card"><div style="font-size:32px;margin-bottom:8px">💕</div><h3>Relationships</h3><textarea placeholder="Soft relationships are..." rows="3"></textarea></div>
+      <div class="soft-card"><div style="font-size:32px;margin-bottom:8px">💰</div><h3>Finances</h3><textarea placeholder="Soft money looks like..." rows="3"></textarea></div>
+      <div class="soft-card"><div style="font-size:32px;margin-bottom:8px">🎨</div><h3>Creativity</h3><textarea placeholder="My soft creativity is..." rows="3"></textarea></div>
+    </div>
+    <h3>What I'm saying NO to this year ✗</h3>
+    <input placeholder="✗ Hustle culture">
+    <input placeholder="✗ Burnout">
+    <input placeholder="✗ Overcommitment">
+    <input placeholder="✗ ">
+    <input placeholder="✗ ">
+    <h3>What I'm saying YES to this year ✓</h3>
+    <input placeholder="✓ Rest">
+    <input placeholder="✓ Joy">
+    <input placeholder="✓ Boundaries">
+    <input placeholder="✓ ">
+    <input placeholder="✓ ">
+    <div class="quote-box">I choose ease. I choose joy. I choose me. 🌿</div>
+    <div class="page-footer">Soft Life Annual Planner • Page 2</div>
+  </div>
+
+  <!-- PAGE 3: ANNUAL INTENTIONS -->
+  <div class="page" id="page3">
+    <h2>My Year, My Way</h2>
+    <div class="subtitle">Not goals. Intentions. Gentle ones.</div>
+    <div class="month-grid">
+      <div class="month-card"><h3>January 🕯️</h3><input placeholder="My intention this month:"><input placeholder="One way I'll rest:"><input placeholder="One joy I'll prioritize:"><div class="month-dot" onclick="this.classList.toggle('done')"></div></div>
+      <div class="month-card"><h3>February 🌹</h3><input placeholder="My intention this month:"><input placeholder="One way I'll rest:"><input placeholder="One joy I'll prioritize:"><div class="month-dot" onclick="this.classList.toggle('done')"></div></div>
+      <div class="month-card"><h3>March 🌱</h3><input placeholder="My intention this month:"><input placeholder="One way I'll rest:"><input placeholder="One joy I'll prioritize:"><div class="month-dot" onclick="this.classList.toggle('done')"></div></div>
+      <div class="month-card"><h3>April 🌷</h3><input placeholder="My intention this month:"><input placeholder="One way I'll rest:"><input placeholder="One joy I'll prioritize:"><div class="month-dot" onclick="this.classList.toggle('done')"></div></div>
+      <div class="month-card"><h3>May ☀️</h3><input placeholder="My intention this month:"><input placeholder="One way I'll rest:"><input placeholder="One joy I'll prioritize:"><div class="month-dot" onclick="this.classList.toggle('done')"></div></div>
+      <div class="month-card"><h3>June 🌊</h3><input placeholder="My intention this month:"><input placeholder="One way I'll rest:"><input placeholder="One joy I'll prioritize:"><div class="month-dot" onclick="this.classList.toggle('done')"></div></div>
+      <div class="month-card"><h3>July 🍋</h3><input placeholder="My intention this month:"><input placeholder="One way I'll rest:"><input placeholder="One joy I'll prioritize:"><div class="month-dot" onclick="this.classList.toggle('done')"></div></div>
+      <div class="month-card"><h3>August 🌻</h3><input placeholder="My intention this month:"><input placeholder="One way I'll rest:"><input placeholder="One joy I'll prioritize:"><div class="month-dot" onclick="this.classList.toggle('done')"></div></div>
+      <div class="month-card"><h3>September 🍂</h3><input placeholder="My intention this month:"><input placeholder="One way I'll rest:"><input placeholder="One joy I'll prioritize:"><div class="month-dot" onclick="this.classList.toggle('done')"></div></div>
+      <div class="month-card"><h3>October 🌙</h3><input placeholder="My intention this month:"><input placeholder="One way I'll rest:"><input placeholder="One joy I'll prioritize:"><div class="month-dot" onclick="this.classList.toggle('done')"></div></div>
+      <div class="month-card"><h3>November ☕</h3><input placeholder="My intention this month:"><input placeholder="One way I'll rest:"><input placeholder="One joy I'll prioritize:"><div class="month-dot" onclick="this.classList.toggle('done')"></div></div>
+      <div class="month-card"><h3>December ❄️</h3><input placeholder="My intention this month:"><input placeholder="One way I'll rest:"><input placeholder="One joy I'll prioritize:"><div class="month-dot" onclick="this.classList.toggle('done')"></div></div>
+    </div>
+    <h3>My Soft Life Theme This Year</h3>
+    <textarea placeholder="The energy I'm inviting this year..." style="border:3px solid var(--blush);border-radius:18px" rows="5"></textarea>
+    <div class="quote-box">Growth doesn't have to be hard.<br>Sometimes it blooms quietly. 🌸</div>
+    <div class="page-footer">Soft Life Annual Planner • Page 3</div>
+  </div>
+
+  <!-- PAGE 4: DAILY RITUALS -->
+  <div class="page" id="page4">
+    <h2>My Sacred Daily Rituals</h2>
+    <div class="grid-2">
+      <div class="soft-card">
+        <h2 style="font-size:24px">☀️ Morning Ritual</h2>
+        <input type="time">
+        <textarea placeholder="My morning looks like..." rows="3"></textarea>
+        <div class="checkbox-item"><input type="checkbox"><span>☕ Hot drink before screens</span></div>
+        <div class="checkbox-item"><input type="checkbox"><span>🌿 5 mins of stillness</span></div>
+        <div class="checkbox-item"><input type="checkbox"><span>🧴 Skin care ritual</span></div>
+        <div class="checkbox-item"><input type="checkbox"><span>📖 Read or journal 10 mins</span></div>
+        <div class="checkbox-item"><input type="checkbox"><span>🌸 Set one soft intention</span></div>
+        <div class="checkbox-item"><input type="checkbox"><span>💧 Drink water first</span></div>
+        <div class="checkbox-item"><input type="checkbox"><span>🪟 Open curtains, let light in</span></div>
+        <div class="checkbox-item"><input type="checkbox"><span>🎵 Play something beautiful</span></div>
+        <input placeholder="My morning affirmation:" style="margin-top:15px">
+      </div>
+      <div class="soft-card">
+        <h2 style="font-size:24px">🌙 Evening Reset</h2>
+        <input type="time">
+        <textarea placeholder="My evening looks like..." rows="3"></textarea>
+        <div class="checkbox-item"><input type="checkbox"><span>🕯️ Light a candle</span></div>
+        <div class="checkbox-item"><input type="checkbox"><span>📵 Screens off 1 hr before bed</span></div>
+        <div class="checkbox-item"><input type="checkbox"><span>🛁 Bath or skin routine</span></div>
+        <div class="checkbox-item"><input type="checkbox"><span>📝 Journal 3 good things</span></div>
+        <div class="checkbox-item"><input type="checkbox"><span>🍵 Herbal tea</span></div>
+        <div class="checkbox-item"><input type="checkbox"><span>🌙 Gratitude moment</span></div>
+        <div class="checkbox-item"><input type="checkbox"><span>📚 Read something light</span></div>
+        <div class="checkbox-item"><input type="checkbox"><span>😴 In bed by ___</span></div>
+        <input placeholder="My evening affirmation:" style="margin-top:15px">
+      </div>
+    </div>
+    <div class="quote-box">A gentle morning is an act of self-love. ☕</div>
+    <div class="page-footer">Soft Life Annual Planner • Page 4</div>
+  </div>
+
+  <!-- PAGE 5: JOY TRACKER -->
+  <div class="page" id="page5">
+    <h2>What Brings Me Joy?</h2>
+    <div class="subtitle">Track your pleasures like they matter. Because they do.</div>
+    <h3>My Joy List — 20 things I love ♡</h3>
+    <div class="grid-2">
+      <div>
+        <input placeholder="♡ "><input placeholder="♡ "><input placeholder="♡ "><input placeholder="♡ "><input placeholder="♡ ">
+        <input placeholder="♡ "><input placeholder="♡ "><input placeholder="♡ "><input placeholder="♡ "><input placeholder="♡ ">
+      </div>
+      <div>
+        <input placeholder="♡ "><input placeholder="♡ "><input placeholder="♡ "><input placeholder="♡ "><input placeholder="♡ ">
+        <input placeholder="♡ "><input placeholder="♡ "><input placeholder="♡ "><input placeholder="♡ "><input placeholder="♡ ">
+      </div>
+    </div>
+    <h3>Monthly Joy Check — Did I do these?</h3>
+    <div style="overflow-x:auto">
+      <div class="joy-grid" id="joyGrid">
+        <!-- Header row -->
+        <div></div>
+        <div style="font-size:11px;text-align:center;font-weight:500">Jan</div>
+        <div style="font-size:11px;text-align:center;font-weight:500">Feb</div>
+        <div style="font-size:11px;text-align:center;font-weight:500">Mar</div>
+        <div style="font-size:11px;text-align:center;font-weight:500">Apr</div>
+        <div style="font-size:11px;text-align:center;font-weight:500">May</div>
+        <div style="font-size:11px;text-align:center;font-weight:500">Jun</div>
+        <div style="font-size:11px;text-align:center;font-weight:500">Jul</div>
+        <div style="font-size:11px;text-align:center;font-weight:500">Aug</div>
+        <div style="font-size:11px;text-align:center;font-weight:500">Sep</div>
+        <div style="font-size:11px;text-align:center;font-weight:500">Oct</div>
+        <div style="font-size:11px;text-align:center;font-weight:500">Nov</div>
+        <div style="font-size:11px;text-align:center;font-weight:500">Dec</div>
+      </div>
+    </div>
+    <h3>My Soft Pleasures Right Now</h3>
+    <div class="grid-3">
+      <div class="soft-card"><h3>📚 Reading</h3><input></div>
+      <div class="soft-card"><h3>🎵 Listening to</h3><input></div>
+      <div class="soft-card"><h3>👁️ Watching</h3><input></div>
+      <div class="soft-card"><h3>🍽️ Eating/drinking</h3><input></div>
+      <div class="soft-card"><h3>🌍 Dreaming about</h3><input></div>
+      <div class="soft-card"><h3>🎨 Creating</h3><input></div>
+    </div>
+    <div class="quote-box">Joy is not a reward. It's a requirement. ✦</div>
+    <div class="page-footer">Soft Life Annual Planner • Page 5</div>
+  </div>
+
+  <!-- PAGE 6: REST & RECOVERY -->
+  <div class="page" id="page6">
+    <div class="cozy-section">
+      <h2>Rest Is Productive</h2>
+      <div class="quote-box" style="color:var(--blush);border-color:var(--blush)">
+        You are not a machine. Rest is not laziness.<br>
+        Rest is how you sustain your beautiful life.
+      </div>
+      <h3>Types of Rest I Need</h3>
+      <div class="checkbox-item"><input type="checkbox"><span>😴 Physical Rest — sleep &amp; body recovery</span></div>
+      <div class="checkbox-item"><input type="checkbox"><span>🧠 Mental Rest — quiet the mind</span></div>
+      <div class="checkbox-item"><input type="checkbox"><span>👁️ Sensory Rest — less screens, less noise</span></div>
+      <div class="checkbox-item"><input type="checkbox"><span>🎨 Creative Rest — absorb beauty</span></div>
+      <div class="checkbox-item"><input type="checkbox"><span>💕 Social Rest — time alone or with safe people</span></div>
+      <div class="checkbox-item"><input type="checkbox"><span>🌿 Nature Rest — fresh air &amp; green spaces</span></div>
+      <div class="checkbox-item"><input type="checkbox"><span>🙏 Spiritual Rest — meaning &amp; connection</span></div>
+      <h3>Which rest am I most neglecting?</h3>
+      <textarea rows="3"></textarea>
+      <h3>My Weekly Rest Schedule</h3>
+      <div class="grid-2">
+        <div><h4>Monday</h4><input placeholder="Morning rest:"><input placeholder="Evening wind-down:"></div>
+        <div><h4>Tuesday</h4><input placeholder="Morning rest:"><input placeholder="Evening wind-down:"></div>
+        <div><h4>Wednesday</h4><input placeholder="Morning rest:"><input placeholder="Evening wind-down:"></div>
+        <div><h4>Thursday</h4><input placeholder="Morning rest:"><input placeholder="Evening wind-down:"></div>
+        <div><h4>Friday</h4><input placeholder="Morning rest:"><input placeholder="Evening wind-down:"></div>
+        <div><h4>Weekend</h4><input placeholder="Rest activity:"><input placeholder="Rest activity:"></div>
+      </div>
+      <h3>Burnout Warning Signs I Watch For</h3>
+      <div class="checkbox-item"><input type="checkbox"><span>Irritability</span></div>
+      <div class="checkbox-item"><input type="checkbox"><span>Can't sleep</span></div>
+      <div class="checkbox-item"><input type="checkbox"><span>No motivation</span></div>
+      <div class="checkbox-item"><input type="checkbox"><span>Headaches</span></div>
+      <div class="checkbox-item"><input type="checkbox"><span>Constant tiredness</span></div>
+      <div class="checkbox-item"><input type="checkbox"><span>Feeling disconnected</span></div>
+      <textarea placeholder="When I notice these, I will..." rows="3"></textarea>
+    </div>
+    <div class="quote-box">Rest first. Then everything else. 🌙</div>
+    <div class="page-footer">Soft Life Annual Planner • Page 6</div>
+  </div>
+
+  <!-- PAGE 7: ABUNDANCE -->
+  <div class="page" id="page7">
+    <h2>Money &amp; Abundance — The Soft Way</h2>
+    <div class="subtitle">Wealth without stress. Abundance with ease.</div>
+    <h3>My Money Mindset Reset</h3>
+    <h4>Old money beliefs I'm releasing:</h4>
+    <input placeholder="I need to hustle to make money" style="text-decoration:line-through">
+    <input placeholder=" ">
+    <input placeholder=" ">
+    <h4>New abundance beliefs I'm choosing:</h4>
+    <input placeholder="Money flows to me with ease" style="background:rgba(191,160,106,0.15);border-color:var(--gold)">
+    <input placeholder=" " style="background:rgba(191,160,106,0.15);border-color:var(--gold)">
+    <input placeholder=" " style="background:rgba(191,160,106,0.15);border-color:var(--gold)">
+    <h3>My Soft Life Financial Goals</h3>
+    <div class="grid-2">
+      <!-- FIX: was missing closing quote on placeholder="$ -->
+      <div class="soft-card">
+        <h3>💰 Income goal this year</h3>
+        <input type="number" placeholder="$ amount">
+        <div class="progress-bar" onclick="fillProgressClick(this,event)"><div class="progress-fill"></div></div>
+      </div>
+      <div class="soft-card">
+        <h3>🏠 Savings goal</h3>
+        <input type="number" placeholder="$ amount">
+        <div class="progress-bar" onclick="fillProgressClick(this,event)"><div class="progress-fill"></div></div>
+      </div>
+      <div class="soft-card">
+        <h3>🎁 Treat myself fund</h3>
+        <input type="number" placeholder="$ amount">
+        <div class="progress-bar" onclick="fillProgressClick(this,event)"><div class="progress-fill"></div></div>
+      </div>
+      <div class="soft-card">
+        <h3>🌍 Experience/travel fund</h3>
+        <input type="number" placeholder="$ amount">
+        <div class="progress-bar" onclick="fillProgressClick(this,event)"><div class="progress-fill"></div></div>
+      </div>
+    </div>
+    <h3>Monthly Abundance Tracker</h3>
+    <div style="overflow-x:auto">
+      <table>
+        <tr><th>Month</th><th>Earned</th><th>Saved</th><th>Spent on joy</th><th>Grateful for</th></tr>
+        <tr><td>Jan</td><td><input type="number"></td><td><input type="number"></td><td><input type="number"></td><td><input></td></tr>
+        <tr><td>Feb</td><td><input type="number"></td><td><input type="number"></td><td><input type="number"></td><td><input></td></tr>
+        <tr><td>Mar</td><td><input type="number"></td><td><input type="number"></td><td><input type="number"></td><td><input></td></tr>
+        <tr><td>Apr</td><td><input type="number"></td><td><input type="number"></td><td><input type="number"></td><td><input></td></tr>
+        <tr><td>May</td><td><input type="number"></td><td><input type="number"></td><td><input type="number"></td><td><input></td></tr>
+        <tr><td>Jun</td><td><input type="number"></td><td><input type="number"></td><td><input type="number"></td><td><input></td></tr>
+        <tr><td>Jul</td><td><input type="number"></td><td><input type="number"></td><td><input type="number"></td><td><input></td></tr>
+        <tr><td>Aug</td><td><input type="number"></td><td><input type="number"></td><td><input type="number"></td><td><input></td></tr>
+        <tr><td>Sep</td><td><input type="number"></td><td><input type="number"></td><td><input type="number"></td><td><input></td></tr>
+        <tr><td>Oct</td><td><input type="number"></td><td><input type="number"></td><td><input type="number"></td><td><input></td></tr>
+        <tr><td>Nov</td><td><input type="number"></td><td><input type="number"></td><td><input type="number"></td><td><input></td></tr>
+        <tr><td>Dec</td><td><input type="number"></td><td><input type="number"></td><td><input type="number"></td><td><input></td></tr>
+      </table>
+    </div>
+    <h3>Soft Money Habits</h3>
+    <div class="checkbox-item"><input type="checkbox"><span>✓ Weekly money date with myself</span></div>
+    <div class="checkbox-item"><input type="checkbox"><span>✓ Celebrate every income, big or small</span></div>
+    <div class="checkbox-item"><input type="checkbox"><span>✓ Save before spending</span></div>
+    <div class="checkbox-item"><input type="checkbox"><span>✓ No shame around wanting nice things</span></div>
+    <div class="checkbox-item"><input type="checkbox"><span>✓ Track without obsessing</span></div>
+    <div class="quote-box">Abundance is a feeling first.<br>Then it becomes reality. ✦</div>
+    <div class="page-footer">Soft Life Annual Planner • Page 7</div>
+  </div>
+
+  <!-- PAGE 8: BOUNDARIES -->
+  <div class="page" id="page8">
+    <h2>My People, My Peace</h2>
+    <h3>People who feel like home ☀️</h3>
+    <div class="grid-2">
+      <input placeholder="Name + why they feel like home">
+      <input placeholder="Name + why they feel like home">
+      <input placeholder="Name + why they feel like home">
+      <input placeholder="Name + why they feel like home">
+    </div>
+    <h3>Energy I'm protecting myself from 🌿</h3>
+    <input placeholder="Person/situation + why">
+    <input placeholder="Person/situation + why">
+    <input placeholder="Person/situation + why">
+    <h3>Soft Boundaries I'm setting</h3>
+    <div class="soft-card" style="margin-bottom:20px">
+      <select><option>Area: Work</option><option>Family</option><option>Friends</option><option>Romance</option><option>Social Media</option><option>Self</option></select>
+      <textarea placeholder="My boundary is:"></textarea>
+      <input placeholder="Why it matters to me:">
+      <div class="checkbox-item"><input type="checkbox"><span>I commit to this boundary</span></div>
+    </div>
+    <div class="soft-card" style="margin-bottom:20px">
+      <select><option>Area: Work</option><option>Family</option><option>Friends</option><option>Romance</option><option>Social Media</option><option>Self</option></select>
+      <textarea placeholder="My boundary is:"></textarea>
+      <input placeholder="Why it matters to me:">
+      <div class="checkbox-item"><input type="checkbox"><span>I commit to this boundary</span></div>
+    </div>
+    <div class="soft-card" style="margin-bottom:20px">
+      <select><option>Area: Work</option><option>Family</option><option>Friends</option><option>Romance</option><option>Social Media</option><option>Self</option></select>
+      <textarea placeholder="My boundary is:"></textarea>
+      <input placeholder="Why it matters to me:">
+      <div class="checkbox-item"><input type="checkbox"><span>I commit to this boundary</span></div>
+    </div>
+    <h3>How I communicate my needs softly</h3>
+    <textarea placeholder="I can say things like..." rows="4"></textarea>
+    <h3>Relationships I'm nourishing</h3>
+    <input placeholder="Person + How I'll show up for them">
+    <input placeholder="Person + How I'll show up for them">
+    <input placeholder="Person + How I'll show up for them">
+    <h3>The love/connection I'm calling in</h3>
+    <textarea placeholder="Dreamy description..." rows="5"></textarea>
+    <div class="quote-box">Soft doesn't mean weak.<br>Boundaries are an act of love. 💕</div>
+    <div class="page-footer">Soft Life Annual Planner • Page 8</div>
+  </div>
+
+  <!-- PAGE 9: SANCTUARY -->
+  <div class="page" id="page9">
+    <h2>My Sanctuary</h2>
+    <div class="subtitle">Your environment is an extension of you. Make it feel like peace.</div>
+    <h3>My Dream Home Feeling</h3>
+    <textarea placeholder="When I walk into my home, I want to feel..." rows="4"></textarea>
+    <h3>Sensory Sanctuary Checklist</h3>
+    <div class="grid-2">
+      <div class="soft-card"><h3>👁️ Sight</h3><div class="checkbox-item"><input type="checkbox"><span>Soft lighting</span></div><div class="checkbox-item"><input type="checkbox"><span>Plants</span></div><div class="checkbox-item"><input type="checkbox"><span>Clean surfaces</span></div><input placeholder="My favorite:"></div>
+      <div class="soft-card"><h3>👂 Sound</h3><div class="checkbox-item"><input type="checkbox"><span>Music</span></div><div class="checkbox-item"><input type="checkbox"><span>Silence</span></div><div class="checkbox-item"><input type="checkbox"><span>Nature sounds</span></div><input placeholder="My favorite:"></div>
+      <div class="soft-card"><h3>👃 Smell</h3><div class="checkbox-item"><input type="checkbox"><span>Candles</span></div><div class="checkbox-item"><input type="checkbox"><span>Diffuser</span></div><div class="checkbox-item"><input type="checkbox"><span>Fresh air</span></div><input placeholder="My favorite:"></div>
+      <div class="soft-card"><h3>✋ Touch</h3><div class="checkbox-item"><input type="checkbox"><span>Soft textures</span></div><div class="checkbox-item"><input type="checkbox"><span>Comfort items</span></div><input placeholder="My favorite:"></div>
+      <div class="soft-card"><h3>👅 Taste</h3><div class="checkbox-item"><input type="checkbox"><span>Nourishing food</span></div><div class="checkbox-item"><input type="checkbox"><span>Beautiful drinks</span></div><input placeholder="My favorite:"></div>
+    </div>
+    <h3>Monthly Home Reset Rituals</h3>
+    <div class="checkbox-item"><input type="checkbox"><span>🌿 Fresh flowers or a plant</span></div>
+    <div class="checkbox-item"><input type="checkbox"><span>🕯️ New candle or scent</span></div>
+    <div class="checkbox-item"><input type="checkbox"><span>🧹 Deep clean one area</span></div>
+    <div class="checkbox-item"><input type="checkbox"><span>🖼️ Refresh a corner or surface</span></div>
+    <div class="checkbox-item"><input type="checkbox"><span>📦 Release one thing I don't need</span></div>
+    <h3>My Soft Home Wishlist</h3>
+    <input placeholder="1. "><input placeholder="2. "><input placeholder="3. "><input placeholder="4. "><input placeholder="5. ">
+    <div class="quote-box">Your home should feel like a hug. 🏡</div>
+    <div class="page-footer">Soft Life Annual Planner • Page 9</div>
+  </div>
+
+  <!-- PAGE 10: CREATIVITY -->
+  <div class="page" id="page10">
+    <h2>My Pleasure Menu 🎨</h2>
+    <div class="subtitle">Things I do for pure joy. No productivity. No outcome. Just because.</div>
+    <h3>My Creative Outlets</h3>
+    <div class="grid-3">
+      <div class="soft-card"><input placeholder="Creative activity"><input placeholder="How it makes me feel"><select><option>Daily</option><option>Weekly</option><option>Monthly</option><option>Rarely</option></select></div>
+      <div class="soft-card"><input placeholder="Creative activity"><input placeholder="How it makes me feel"><select><option>Daily</option><option>Weekly</option><option>Monthly</option><option>Rarely</option></select></div>
+      <div class="soft-card"><input placeholder="Creative activity"><input placeholder="How it makes me feel"><select><option>Daily</option><option>Weekly</option><option>Monthly</option><option>Rarely</option></select></div>
+      <div class="soft-card"><input placeholder="Creative activity"><input placeholder="How it makes me feel"><select><option>Daily</option><option>Weekly</option><option>Monthly</option><option>Rarely</option></select></div>
+      <div class="soft-card"><input placeholder="Creative activity"><input placeholder="How it makes me feel"><select><option>Daily</option><option>Weekly</option><option>Monthly</option><option>Rarely</option></select></div>
+      <div class="soft-card"><input placeholder="Creative activity"><input placeholder="How it makes me feel"><select><option>Daily</option><option>Weekly</option><option>Monthly</option><option>Rarely</option></select></div>
+    </div>
+    <h3>My Soft Life Bucket List</h3>
+    <div class="grid-2" id="bucketList"></div>
+    <h3>Currently Loving...</h3>
+    <div class="grid-3">
+      <div class="soft-card"><h3>📚 Reading</h3><input></div>
+      <div class="soft-card"><h3>🎵 Listening to</h3><input></div>
+      <div class="soft-card"><h3>👁️ Watching</h3><input></div>
+      <div class="soft-card"><h3>🍽️ Eating/drinking</h3><input></div>
+      <div class="soft-card"><h3>🌍 Dreaming about</h3><input></div>
+      <div class="soft-card"><h3>🎨 Creating</h3><input></div>
+    </div>
+    <h3>Things I Do That Feel Like Play</h3>
+    <textarea rows="4"></textarea>
+    <h3>Things I Want to Try</h3>
+    <input placeholder="1. "><input placeholder="2. "><input placeholder="3. "><input placeholder="4. "><input placeholder="5. ">
+    <div class="quote-box">A well-lived life is full of<br>beautiful, pointless pleasures. ✨</div>
+    <div class="page-footer">Soft Life Annual Planner • Page 10</div>
+  </div>
+
+  <!-- PAGE 11: WEEKLY RESET -->
+  <div class="page" id="page11">
+    <h2>My Weekly Soft Reset</h2>
+    <div class="subtitle">Every Sunday is a chance to begin again, gently.</div>
+    <div class="grid-2">
+      <div class="soft-card">
+        <input type="week">
+        <input placeholder="This week's soft intention:">
+        <h3>What I want MORE of this week:</h3>
+        <input placeholder="1. "><input placeholder="2. "><input placeholder="3. ">
+        <h3>What I'm releasing this week:</h3>
+        <input placeholder="1. "><input placeholder="2. "><input placeholder="3. ">
+        <input placeholder="One thing I'll rest from:">
+        <input placeholder="One joy I'll schedule in:">
+        <h3>Weekly mood</h3>
+        <div class="mood-grid">
+          <div class="mood-emoji" onclick="selectMood(this)">😊</div>
+          <div class="mood-emoji" onclick="selectMood(this)">😌</div>
+          <div class="mood-emoji" onclick="selectMood(this)">🥰</div>
+          <div class="mood-emoji" onclick="selectMood(this)">😴</div>
+          <div class="mood-emoji" onclick="selectMood(this)">✨</div>
+          <div class="mood-emoji" onclick="selectMood(this)">🌸</div>
+          <div class="mood-emoji" onclick="selectMood(this)">☁️</div>
+        </div>
+        <h3>Weekly energy rating</h3>
+        <div class="star-rating">
+          <span class="star" onclick="rateStar(this,1)">★</span>
+          <span class="star" onclick="rateStar(this,2)">★</span>
+          <span class="star" onclick="rateStar(this,3)">★</span>
+          <span class="star" onclick="rateStar(this,4)">★</span>
+          <span class="star" onclick="rateStar(this,5)">★</span>
+        </div>
+      </div>
+      <div class="soft-card">
+        <h3>My wins from last week:</h3>
+        <input placeholder="1. "><input placeholder="2. "><input placeholder="3. ">
+        <h3>What drained me:</h3>
+        <input placeholder="1. "><input placeholder="2. ">
+        <h3>What restored me:</h3>
+        <input placeholder="1. "><input placeholder="2. ">
+        <h3>Weekly self-care checklist</h3>
+        <div class="checkbox-item"><input type="checkbox"><span>🛁 Luxurious bath or shower</span></div>
+        <div class="checkbox-item"><input type="checkbox"><span>💆 Some form of body care</span></div>
+        <div class="checkbox-item"><input type="checkbox"><span>🌿 Time outdoors</span></div>
+        <div class="checkbox-item"><input type="checkbox"><span>📵 Social media break</span></div>
+        <div class="checkbox-item"><input type="checkbox"><span>🎵 Music that feeds my soul</span></div>
+        <div class="checkbox-item"><input type="checkbox"><span>☕ Slow morning at least once</span></div>
+        <div class="checkbox-item"><input type="checkbox"><span>💕 Quality time with someone I love</span></div>
+        <div class="checkbox-item"><input type="checkbox"><span>📖 Reading for pleasure</span></div>
+        <h3>My affirmation for the week:</h3>
+        <div class="quote-box" style="padding:15px">
+          <input placeholder="I am..." style="background:transparent;border:none;text-align:center;font-size:18px;box-shadow:none;margin:0">
+        </div>
+      </div>
+    </div>
+    <div class="page-footer">Soft Life Annual Planner • Page 11</div>
+  </div>
+
+  <!-- PAGE 12: YEAR REVIEW -->
+  <div class="page" id="page12">
+    <h2>How Soft Was My Year?</h2>
+    <div style="background:linear-gradient(135deg,var(--blush),var(--linen));padding:40px;border-radius:25px">
+      <h3>My Soft Life Year in Review</h3>
+      <div class="grid-2">
+        <div><h4>January Me</h4><textarea rows="5"></textarea></div>
+        <div><h4>December Me</h4><textarea rows="5"></textarea></div>
+      </div>
+      <h3>The Softest Moments of My Year</h3>
+      <input placeholder="1. "><input placeholder="2. "><input placeholder="3. "><input placeholder="4. "><input placeholder="5. ">
+      <h3>What I Chose Ease Over Struggle In</h3>
+      <textarea rows="4"></textarea>
+      <h3>Rest I Allowed Myself</h3>
+      <textarea rows="4"></textarea>
+      <h3>Joys I Fully Received</h3>
+      <input placeholder="1. "><input placeholder="2. "><input placeholder="3. "><input placeholder="4. "><input placeholder="5. ">
+      <h3>How I Showed Up for Myself</h3>
+      <p style="margin:8px 0 4px">Rest</p>
+      <div class="star-rating"><span class="star" onclick="rateStar(this,1)">★</span><span class="star" onclick="rateStar(this,2)">★</span><span class="star" onclick="rateStar(this,3)">★</span><span class="star" onclick="rateStar(this,4)">★</span></div>
+      <p style="margin:8px 0 4px">Joy</p>
+      <div class="star-rating"><span class="star" onclick="rateStar(this,1)">★</span><span class="star" onclick="rateStar(this,2)">★</span><span class="star" onclick="rateStar(this,3)">★</span><span class="star" onclick="rateStar(this,4)">★</span></div>
+      <p style="margin:8px 0 4px">Boundaries</p>
+      <div class="star-rating"><span class="star" onclick="rateStar(this,1)">★</span><span class="star" onclick="rateStar(this,2)">★</span><span class="star" onclick="rateStar(this,3)">★</span><span class="star" onclick="rateStar(this,4)">★</span></div>
+      <p style="margin:8px 0 4px">Abundance</p>
+      <div class="star-rating"><span class="star" onclick="rateStar(this,1)">★</span><span class="star" onclick="rateStar(this,2)">★</span><span class="star" onclick="rateStar(this,3)">★</span><span class="star" onclick="rateStar(this,4)">★</span></div>
+      <h3>My Soft Life Score</h3>
+      <div class="slider-wrap">
+        <input type="range" class="slider" min="1" max="10" value="5" id="softScore">
+        <div style="margin-top:8px">Score: <span id="softScoreVal">5</span>/10</div>
+      </div>
+      <h3>Letter to My Future Soft Self</h3>
+      <textarea class="lined" placeholder="Dear future me..." rows="12"></textarea>
+      <div style="text-align:center;margin-top:20px">
+        <input placeholder="Your signature" style="background:white;border:none;text-align:center;width:300px;box-shadow:none">
+        <div style="margin-top:20px;font-style:italic;color:var(--caramel)">With all the softness in the world,<br><span id="sigName">[your name]</span> 🌸</div>
+      </div>
+    </div>
+    <div class="quote-box" style="font-size:24px;margin-top:40px">
+      You built a soft life.<br>
+      You chose yourself, every single day.<br>
+      That is everything. ✦
+    </div>
+    <div class="page-footer">Soft Life Annual Planner • Page 12</div>
+  </div>
+
+</div>
+
+<button class="print-btn" onclick="window.print()">🖨️ Save as PDF</button>
+
+<script>
+// FIX: was selecting .nav-btn (wrong class). Now correctly selects .nav button
+function showPage(num){
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById('page' + num).classList.add('active');
+  document.querySelectorAll('.nav button')[num - 1].classList.add('active');
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+// Checkbox items — click anywhere on row to toggle
+document.querySelectorAll('.checkbox-item').forEach(item => {
+  item.addEventListener('click', e => {
+    if(e.target.tagName !== 'INPUT'){
+      const cb = item.querySelector('input[type="checkbox"]');
+      if(cb) cb.checked = !cb.checked;
+    }
+    const cb = item.querySelector('input[type="checkbox"]');
+    if(cb) item.classList.toggle('checked', cb.checked);
+  });
+});
+
+// FIX: progress bars now fill based on click position (% of bar width)
+function fillProgressClick(bar, event){
+  const rect = bar.getBoundingClientRect();
+  const percent = Math.round(((event.clientX - rect.left) / rect.width) * 100);
+  bar.querySelector('.progress-fill').style.width = percent + '%';
+}
+
+function selectMood(el){
+  el.parentElement.querySelectorAll('.mood-emoji').forEach(e => e.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function rateStar(star, num){
+  const stars = star.parentElement.querySelectorAll('.star');
+  stars.forEach((s, i) => s.classList.toggle('active', i < num));
+}
+
+// Soft life score slider
+document.getElementById('softScore').addEventListener('input', e => {
+  document.getElementById('softScoreVal').textContent = e.target.value;
+});
+
+// Sync owner name to signature
+document.getElementById('owner').addEventListener('input', e => {
+  document.getElementById('sigName').textContent = e.target.value || '[your name]';
+});
+
+// Set today's date as default
+document.getElementById('softStart').valueAsDate = new Date();
+
+// Build joy grid rows dynamically
+const joyCategories = [
+  '🌸 Nature', '☕ Slow mornings', '💃 Movement', '🎨 Creativity',
+  '👭 Quality time', '📚 Reading', '🛁 Self-care', '🌍 Adventure'
+];
+const grid = document.getElementById('joyGrid');
+joyCategories.forEach(cat => {
+  const label = document.createElement('div');
+  label.style.cssText = 'font-size:13px;display:flex;align-items:center;white-space:nowrap';
+  label.textContent = cat;
+  grid.appendChild(label);
+  for(let m = 0; m < 12; m++){
+    const cell = document.createElement('div');
+    cell.className = 'joy-cell';
+    cell.onclick = function(){ this.classList.toggle('checked'); };
+    grid.appendChild(cell);
+  }
+});
+
+// Build bucket list checkboxes
+const bucket = document.getElementById('bucketList');
+for(let i = 1; i <= 20; i++){
+  const item = document.createElement('div');
+  item.className = 'checkbox-item';
+  item.innerHTML = `<input type="checkbox"><span contenteditable="true" style="flex:1;outline:none;min-width:0">Experience ${i}</span>`;
+  item.addEventListener('click', e => {
+    if(e.target.tagName !== 'INPUT' && e.target.getAttribute('contenteditable') !== 'true'){
+      const cb = item.querySelector('input[type="checkbox"]');
+      if(cb) cb.checked = !cb.checked;
+      item.classList.toggle('checked', cb.checked);
+    }
+    const cb = item.querySelector('input[type="checkbox"]');
+    if(cb) item.classList.toggle('checked', cb.checked);
+  });
+  bucket.appendChild(item);
+}
+
+// Auto-resize textareas
+document.querySelectorAll('textarea').forEach(ta => {
+  ta.addEventListener('input', () => {
+    ta.style.height = 'auto';
+    ta.style.height = ta.scrollHeight + 'px';
+  });
+});
+</script>
+</body>
+</html>
